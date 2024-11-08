@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Chat Room</h2>
+            <p>Welcome, {{ username }}!</p>
+        </div>
+        <div id="chat-box" class="chat-box"></div>
+        <form id="message-form" class="chat-input">
+            <input type="text" id="message" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    
+    <script>
+        var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+        
+        document.getElementById('message-form').onsubmit = function(e) {
+            e.preventDefault();
+            let msg = document.getElementById('message').value;
+            socket.emit('message', msg);
+            document.getElementById('message').value = '';
+        };
+
+        socket.on('message', function(msg) {
+            let chatBox = document.getElementById('chat-box');
+            let messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = msg;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+    </script>
+</body>
+</html>
